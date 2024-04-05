@@ -14,9 +14,9 @@ router.route("/verifyUser").post(verifyUser, (req, res) => res.end());
 // authenticate middleware verify user token from headers
 router.get('/getUser/:id', authenticate ,getUser);
 // route to generate the otp
-router.get('/generateOTP', verifyUser, localVairables, generateOTP);
+router.post('/generateOTP', verifyUser, localVairables, generateOTP);
 // route to verify the otp
-router.get('/verifyOTP', verifyUser, verifyOTP);
+router.post('/verifyOTP', verifyUser, verifyOTP);
 //create reset session to reset the password 
 router.get("/createResetSession", createResetSession);
 // route for reset the password

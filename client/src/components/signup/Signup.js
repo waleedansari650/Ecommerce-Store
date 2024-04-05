@@ -52,10 +52,8 @@ function Signup() {
         }
 
         values = { ...values, profile: avatarImage };
-        console.log("all values : ", values);
         if (values) {
           let registerPromise = userRegister(values);
-          console.log("registerPromise : ", registerPromise);
           toast.promise(registerPromise, {
             loading: "Registering...!",
             success: (response) => <b>🦄 {response.message}!</b>,

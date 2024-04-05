@@ -10,9 +10,7 @@ const otpGenerator = require("otp-generator");
 // verify user
 module.exports.verifyUser = async (req, res, next) => {
   try {
-    //   const { email } = req.method == "GET" ? req.query : req.body;
     const { email } = req.body;
-    console.log("email : ", email);
     // Check the user existence
     const user = await Users.findOne({ email });
     if (!user) {
@@ -43,7 +41,6 @@ module.exports.userRegister = async (req, res) => {
     const { name, email, password } = req.body;
     const userEmail = await Users.findOne({ email });
     let url = `http://localhost:4000/uploads/${req.file.filename}`;
-    console.log("req.file",url );
     // If the user already exists, return an error
       if (userEmail) {
         return res.status(400).json({ error: "User email already exists" });
@@ -81,7 +78,6 @@ module.exports.userRegister = async (req, res) => {
 module.exports.activation = async (req, res) => {
   try {
     const { activation_token } = req.params;
-    console.log("activation : ", activation_token);
     const newUser = jwt.verify(activation_token, process.env.SECRET_KEY);
     if (!newUser) {
       return res.status(400).json({ error: "Invalid token" });
@@ -126,13 +122,10 @@ module.exports.login = async (req, res) => {
   try {
     // Check if the user exists
     const userExist = await Users.findOne({ email });
-    console.log("userExist : ", userExist); // Log userExist for debugging
     if (!userExist) {
       return res.status(401).json({ message: "User not found...!" });
     }
     // Check if the password is correct
-    console.log("Stored Password: ", userExist.password); // Log stored password for debugging
-    console.log("Entered Password: ", password); // Log entered password for debugging
     const isPasswordMatch = await bcrypt.compare(password, userExist.password);
     if (!isPasswordMatch) {
       return res.status(401).json({ message: "Invalid credentials...!" });
@@ -157,13 +150,11 @@ GET : http://localhost:4000/getUser/65f9f025febece71fefc8521
 */
 module.exports.getUser = async (req, res) => {
   const { id } = req.params;
-  console.log("id: ", id);
   try {
     if (!id) {
       return res.status(400).json({ error: "Please provide the user id...!" });
     }
     const user = await Users.findById(id).select("-password");
-    console.log("user: ", user);
     if (!user) {
       return res.status(404).json({ error: "User not found...!" });
     }
@@ -182,7 +173,6 @@ module.exports.generateOTP = async (req, res) => {
       upperCaseAlphabets: false,
       specialChars: false,
     });
-    console.log("G", req.app.locals.OTP);
     const user = req.user;
     await sendMail({
       email: user.email,
@@ -202,8 +192,7 @@ module.exports.generateOTP = async (req, res) => {
 module.exports.verifyOTP = async (req, res) => {
   try {
     const { code } = req.body;
-    console.log("V", req.app.locals.OTP);
-    if (code === req.app.locals.OTP) {
+    if (code === req.app.locals.OTP && req.app.locals.OTP !== null) {
       req.app.locals.OTP = null;
       req.app.locals.resetSession = true;
       return res.status(201).send({ msg: "OTP Verify successfully...!" });

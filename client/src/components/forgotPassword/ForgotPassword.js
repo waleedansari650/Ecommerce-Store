@@ -10,14 +10,14 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { PhotoCamera } from "@mui/icons-material";
+import { EmailOutlined } from "@mui/icons-material"; // Import EmailOutlined icon
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate, Link as RouterLink } from "react-router-dom"; // Import Link as RouterLink
 import toast, { Toaster } from "react-hot-toast";
-import { loginUser } from "../../services/authenticateServies";
+import { loginUser, recoverAccount } from "../../services/authenticateServies";
 
-function Signin() {
+function ForgotPassword() {
   const [avatarImage, setAvatarImage] = React.useState(null);
   const navigate = useNavigate();
 
@@ -28,39 +28,35 @@ function Signin() {
         /^[a-zA-Z0-9._%+-]+@gmail\.com$/,
         "Email must be a valid Gmail address"
       )
-      .required("Email is required"),
-    password: Yup.string().required("Password is required"),
+      .required("Enter your account mail"),
+  
   });
 
   const formik = useFormik({
     initialValues: {
       email: "",
-      password: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
         if (values) {
-          let loginUserPromise = loginUser(values);
-          toast.promise(loginUserPromise, {
+          let recoverAccountPromise = recoverAccount(values);
+          toast.promise(recoverAccountPromise, {
             loading: "Logging in...!",
-            success: "🦄 Login Successfuly ",
-            error: "🦄Invalid Credentials...!",
+            success: (response) => <b>🦄 {response.data.message}</b>,
+            error: (error)=> <b>{error.error}</b>,
           });
-          loginUserPromise
-            .then((res) => {
-              localStorage.setItem("token", res.data.token);
-              setTimeout(() => {
-                navigate("/");
+          recoverAccountPromise.then(()=>{
+            setTimeout(()=>{
+               navigate(`/OTP?email=${values.email}`);
                 formik.resetForm();
-              }, 2000);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+            }, 2000)
+          }).catch((error)=>{
+            console.log(error);
+          })
         }
       } catch (error) {
-        toast.error("🦄 Login failed. Please try again later.!", {});
+        toast.error("🦄 Password Recovery Failed!");
       }
     },
   });
@@ -80,7 +76,7 @@ function Signin() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign In
+            Recovery
           </Typography>
           <Box
             component="form"
@@ -100,34 +96,18 @@ function Signin() {
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              {...formik.getFieldProps("password")}
-              error={formik.touched.password && Boolean(formik.errors.password)}
-              helperText={formik.touched.password && formik.errors.password}
-            />
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              startIcon={<EmailOutlined />} // Add EmailOutlined icon
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Send Mail
             </Button>
             <Grid container>
-              <Grid item xs>
-                <RouterLink to="/forgot-password" variant="body2"> {/* Use RouterLink */}
-                  Forgot password?
-                </RouterLink>
-              </Grid>
-              <Grid item>
+              
+            <Grid item>
                 <RouterLink to="/signup" variant="body2">
                   Don't have an account? Sign Up
                 </RouterLink>
@@ -140,4 +120,4 @@ function Signin() {
   );
 }
 
-export default Signin;
+export default ForgotPassword;

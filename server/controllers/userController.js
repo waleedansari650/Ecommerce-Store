@@ -1,8 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const Users = require("../models/Users");
-const fs = require("fs");
-const path = require("path");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const otpGenerator = require("otp-generator");
@@ -49,7 +47,7 @@ module.exports.userRegister = async (req, res) => {
       name: name,
       email: email,
       password: password,
-      profile: `http://localhost:4000/uploads/${req.file.filename}` || "",
+      profile: url || "",
     };
     // Generate an activation token
     const activationToken = createActivationToken(user);

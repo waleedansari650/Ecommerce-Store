@@ -1,18 +1,9 @@
-import React, { useState } from "react";
-import Navbar from "../header/Navbar";
-import ProductTable from "../productTable/ProductTable";
-import Footer from "../footer/Footer";
+import React from 'react'
 
 const Products = () => {
-
   return (
-   <>
-     <Navbar />
-    <ProductTable />
-    <Footer />
-   </>
-   
-  );
-};
+    <div>Products</div>
+  )
+}
 
-export default Products;
+export default Products

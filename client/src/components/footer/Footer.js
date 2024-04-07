@@ -1,13 +1,9 @@
-import React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
+import { AppBar, Toolbar, Typography, Grid } from "@mui/material";
 
-function Footer() {
+const Footer = () => {
   return (
-    <AppBar position="static" color="primary">
-      <Toolbar>
+    <AppBar position="relative" color="primary" style={{ top: "50vh", bottom: 0,  }}>
+      <Toolbar style={{postition : "absolute"}}>
         <Grid container justifyContent="center">
           <Grid item>
             <Typography variant="body1" color="inherit">
@@ -18,6 +14,6 @@ function Footer() {
       </Toolbar>
     </AppBar>
   );
-}
+};
 
 export default Footer;

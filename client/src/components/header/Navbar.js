@@ -14,7 +14,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 import { useNavigate } from "react-router-dom";
 
-const pages = ["Home", "Add Product", "Products"];
+const pages = ["Home", "Products"];
 // const settings = ["Profile", "Account", "Dashboard", "Logout"];
 const settings = ["Sign in", "Sign up"];
 
@@ -32,9 +32,7 @@ function Navbar() {
   const handleCloseNavMenu = (page) => {
     if(page === "Home"){
         navigate('/');
-    }   else if(page === "Add Product"){
-        navigate('/addProduct');
-    }   else if(page === "Products"){
+    }  else if(page === "Products"){
         navigate('/products');
     } else if(page === 'cart'){
     navigate('/cart');

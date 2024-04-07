@@ -18,18 +18,13 @@ const productSchema = new mongoose.Schema({
     },
 
     image : {
-        type: Array,
+        type: String,
         required : [true, "Product images are required"],
     },
     stock : {
         type: Number,
         required : [true, "Stock is required"],
     },
-    sold : {
-        type: Number,
-        default : 0,
-    },
-
 })
 
 module.exports = mongoose.models.Products || mongoose.model('Products', productSchema);

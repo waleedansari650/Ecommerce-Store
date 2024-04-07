@@ -4,8 +4,10 @@ require('dotenv').config();
 
 module.exports.authenticate = async (req, res, next) => {
     try {
+        console.log("req.headers : ", req.headers);
         const token = req.headers.authorization.split(" ")[1];
         const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("decodeToken : ", decodeToken);
         const user = await Users.findOne({_id : decodeToken.userId});
         if(!user){
             return res.status(401).send({error : "Authentication Failed!"});

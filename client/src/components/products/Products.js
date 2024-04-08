@@ -8,7 +8,7 @@ const Products = () => {
   return (
    <>
      <Navbar />
-    <ProductTable />
+    <ProductTable/>
     <Footer />
    </>
    

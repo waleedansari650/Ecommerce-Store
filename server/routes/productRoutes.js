@@ -6,8 +6,8 @@ const { addProduct, deleteProduct, updateProduct, getProducts, getSpecificProduc
 
 
 router.post('/addProduct',authenticate,  upload.single("profile"), addProduct);
-router.delete('/deleteProduct/:id', authenticate, deleteProduct);
-router.put('/updateProduct/:id', authenticate, updateProduct);
+router.delete('/deleteProduct/:id', authenticate,  deleteProduct);
+router.put('/updateProduct/:id', authenticate, upload.single("profile"), updateProduct);
 router.get('/getProducts', authenticate, getProducts);
 router.get('/getSpecificProduct/:id', authenticate, getSpecificProduct);    
 

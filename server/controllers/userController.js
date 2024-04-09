@@ -130,7 +130,7 @@ module.exports.login = async (req, res) => {
     }
     // Create JWT token
     const token = jwt.sign({ userId: userExist._id }, process.env.SECRET_KEY, {
-      expiresIn: "1h",
+      expiresIn: "12h",
     });
     return res.status(200).json({
       message: "User Login Successful...!",

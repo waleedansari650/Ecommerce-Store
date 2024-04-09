@@ -1,14 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 
-export default function PreviewImage({ file }) {
-    const [preview, setPreview] = useState({});
-    if (file) {
-        const reader = new FileReader()
-        //convert in the image url which we read in the source of image element
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            setPreview(reader.result)
+const PreviewImage = ({ file }) => {
+    const [preview, setPreview] = useState("");
+
+    useEffect(() => {
+        if (file instanceof File) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                setPreview(reader.result);
+            };
+        } else if (typeof file === 'string') {
+            setPreview(file); // If file is already a URL
+        } else {
+            setPreview(""); // Reset preview if no file
         }
-    }
-    return <img style={{ width: "100px" }} src={preview} alt="" />
+    }, [file]);
+
+    return <img style={{ width: "100px" }} src={preview} alt="" />;
 }
+
+export default PreviewImage;

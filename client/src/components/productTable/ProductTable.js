@@ -113,7 +113,7 @@ const ProductTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {products?.map((product) => (
+              { products?.map((product) => (
                 <TableRow key={product._id} sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}>
                   <TableCell>{product._id}</TableCell>
                   <TableCell style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</TableCell>
@@ -147,9 +147,7 @@ const ProductTable = () => {
               )) }
             </TableBody>
           </Table>
-          {
-            !products && <AnimateSkeleton />
-          }
+        
         </TableContainer>
       </div>
       <Modal isModalOpen={isModalOpen} closeModal={closeModal} modelMode={modelMode} setModalOpen= {setModalOpen} updateProduct={updateProduct} />

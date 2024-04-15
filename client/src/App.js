@@ -23,13 +23,13 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/OTP" element={<OTP />} />
         <Route path="/resetPassword" element={<ResetPassword />} />
-        AuthorizeUser
         <Route path="/products" element={<AuthorizeUser><Products /></AuthorizeUser>} />
         <Route path="/cart" element={<AuthorizeUser><Cart /></AuthorizeUser>} />
         <Route
           path="/activation/:activation_token"
           element={<ActivationPage />}
         />
+        
       </Routes>
     </>
   );

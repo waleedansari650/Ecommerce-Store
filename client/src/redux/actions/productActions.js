@@ -1,4 +1,4 @@
-export {ADD_NEW_PRODUCT, GET_ALL_PRODUCTS, DELETE_PRODUCT, UPDATE_PRODUCT,PRODUCT_LIST_TO_CART} from "../action-types/productActionType";
+export {ADD_NEW_PRODUCT, DECREASE_QUANTITY,INCREASE_QUANTITY, PRODUCT_REMOVE_TO_CART, GET_ALL_PRODUCTS, DELETE_PRODUCT, UPDATE_PRODUCT,PRODUCT_LIST_TO_CART} from "../action-types/productActionType";
 
 export const addingProduct = (data) =>{
     return {
@@ -31,4 +31,23 @@ export const addProductToCart = (data) =>{
         payload : data
     }
 }
-
+export const removeProductToCart = (data) =>{
+    return {
+        type: "PRODUCT_REMOVE_TO_CART",
+        payload : data
+    }
+}
+export const increaseQuantity = (id) =>{
+    console.log("data", id);
+    return {
+        type: "INCREASE_QUANTITY",
+        payload : id
+    }
+}
+export const decreaseQuantity = (id) =>{
+    console.log("ID : ", id)
+    return {
+        type : "DECREASE_QUANTITY",
+        payload : id
+    }
+}

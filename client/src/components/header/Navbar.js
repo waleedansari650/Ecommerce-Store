@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const pages = ["Home", "Products"];
 // const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -22,6 +23,8 @@ function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null); 
   const navigate = useNavigate();
+  const cartProductCount = useSelector((state) => state.getproductsdata.totalCount);
+ 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -106,7 +109,7 @@ function Navbar() {
           </Box>
           {/* cart badge */}
           <Badge
-            badgeContent={4}
+            badgeContent={cartProductCount ? cartProductCount : "0"}
             color="warning"
             anchorOrigin={{ vertical: "top", horizontal: "left",  }}
             style={{ marginRight: '1rem', transition: 'transform 0.2s' }}

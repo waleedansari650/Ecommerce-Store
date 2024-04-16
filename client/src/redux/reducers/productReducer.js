@@ -4,14 +4,31 @@ import {
   DELETE_PRODUCT,
   UPDATE_PRODUCT,
   PRODUCT_LIST_TO_CART,
+  PRODUCT_REMOVE_TO_CART,
+  INCREASE_QUANTITY,
+  DECREASE_QUANTITY,
 } from "../action-types/productActionType";
 
 const initialState = {
   products: [],
   cartItems: [],
-  totalCount: 0, 
+  totalCount: localStorage.getItem("cartItems")
+    ? JSON.parse(localStorage.getItem("cartItems")).reduce(
+        (total, item) => total + item.quantity,
+        0
+      )
+    : 0,
+  totalPrice: localStorage.getItem("cartItems")
+    ? JSON.parse(localStorage.getItem("cartItems")).reduce(
+        (total, item) => total + item.product.price * item.quantity,
+        0
+      )
+    : 0,
 };
-
+const savedCartItems = JSON.parse(localStorage.getItem("cartItems"));
+if (savedCartItems) {
+  initialState.cartItems = savedCartItems;
+}
 export const productReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_NEW_PRODUCT:
@@ -38,25 +55,153 @@ export const productReducer = (state = initialState, action) => {
           product._id === action.payload._id ? action.payload : product
         ),
       };
-    case PRODUCT_LIST_TO_CART:
-        const existingProductIndex = state.cartItems.findIndex(item => item.id === action.payload.id);
-        let updatedCartItems;
-        if (existingProductIndex !== -1) {
-          // If product already exists in cart, increment the quantity
-          updatedCartItems = state.cartItems.map((item, index) => {
-            if (index === existingProductIndex) {
-              return { ...item, quantity: item.quantity + 1 }; // Increment quantity
-            }
-            return item;
-          });
-        } else {
-          // If product doesn't exist in cart, add it with quantity of 1
-          updatedCartItems = [...state.cartItems, { ...action.payload, quantity: 1 }];
-        }
-        const totalCount = updatedCartItems.reduce((total, item) => total + item.quantity, 0); // Calculate total count
-        return { ...state, cartItems: updatedCartItems, totalCount };
 
-    
+    case PRODUCT_LIST_TO_CART:
+      const productId = action.payload;
+      const existingCartItemIndex = state.cartItems.findIndex(
+        (item) => item.product._id === productId
+      );
+      let updatedCartItems;
+      if (existingCartItemIndex !== -1) {
+        // If product already exists in cart, increment the quantity
+        updatedCartItems = state.cartItems.map((item, index) => {
+          if (index === existingCartItemIndex) {
+            return { ...item, quantity: item.quantity + 1 }; // Increment quantity
+          }
+          return item;
+        });
+      } else {
+        // If product doesn't exist in cart, add it with quantity of 1
+        const productToAdd = state.products.find(
+          (product) => product._id === productId
+        );
+        if (!productToAdd) {
+          throw new Error("Product not found");
+        }
+        updatedCartItems = [
+          ...state.cartItems,
+          { product: productToAdd, quantity: 1 },
+        ];
+      }
+      // Save updated cart items to local storage
+      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+      const totalCount = updatedCartItems.reduce(
+        (total, item) => total + item.quantity,
+        0
+      ); // Calculate total count
+      const totalPrice = updatedCartItems.reduce(
+        (total, item) => total + item.product.price * item.quantity,
+        0
+      ); // Calculate total price
+      return { ...state, cartItems: updatedCartItems, totalCount, totalPrice };
+
+
+
+    case PRODUCT_REMOVE_TO_CART:
+      const productIdToRemove = action.payload;
+      const existingCartItemIndexToRemove = state.cartItems.findIndex(
+        (item) => item.product._id === productIdToRemove
+      );
+
+      if (existingCartItemIndexToRemove !== -1) {
+        // If the product is found in the cartItems array
+        const updatedCartItems = [...state.cartItems];
+        updatedCartItems.splice(existingCartItemIndexToRemove, 1); // Remove the item at the specific index
+
+        // Save updated cart items to local storage
+        localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+
+        const totalCountAfterRemoveToCart = updatedCartItems.reduce(
+          (total, item) => total + item.quantity,
+          0
+        ); // Calculate total count
+
+        const totalPriceAfterRemoveToCart = updatedCartItems.reduce(
+          (total, item) => total + item.product.price * item.quantity,
+          0
+        ); // Calculate total price
+
+        return {
+          ...state,
+          cartItems: updatedCartItems,
+          totalCount: totalCountAfterRemoveToCart,
+          totalPrice: totalPriceAfterRemoveToCart,
+        };
+      } else {
+        return state;
+      }
+    case INCREASE_QUANTITY:
+      const productIdToIncrease = action.payload;
+      const existingCartItemIndexToIncrease = state.cartItems.findIndex(
+        (item) => item.product._id === productIdToIncrease
+      );
+      if (existingCartItemIndexToIncrease !== -1) {
+        // If the product is found in the cartItems array
+        // targeted index item quantity increase
+        const updatedCartItems = [...state.cartItems];
+        updatedCartItems[existingCartItemIndexToIncrease] = {
+          ...updatedCartItems[existingCartItemIndexToIncrease],
+          quantity:
+            updatedCartItems[existingCartItemIndexToIncrease].quantity + 1,
+        };
+        const totalCountAfterIncrease = updatedCartItems.reduce(
+          (total, item) => total + item.quantity,
+          0
+        ); // Calculate total count
+
+        const totalPriceAfterIncrease = updatedCartItems.reduce(
+          (total, item) => total + item.product.price * item.quantity,
+          0
+        ); // Calculate total price
+        // Save updated cart items to local storage
+        localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+
+        return {
+          ...state,
+          cartItems: updatedCartItems,
+          totalCount: totalCountAfterIncrease,
+          totalPrice: totalPriceAfterIncrease,
+        };
+      } else {
+        return state;
+      }
+      case DECREASE_QUANTITY:
+        const productIdToDecrease = action.payload;
+        const existingCartItemIndexToDecrease = state.cartItems.findIndex(
+          (item) => item.product._id === productIdToDecrease
+        );
+      
+        if (existingCartItemIndexToDecrease !== -1) {
+          const decreaseCartItems = [...state.cartItems];
+          // Decrease the quantity without mutating the existing state
+          decreaseCartItems[existingCartItemIndexToDecrease] = {
+            ...decreaseCartItems[existingCartItemIndexToDecrease],
+            quantity: decreaseCartItems[existingCartItemIndexToDecrease].quantity - 1,
+          };
+      
+          // Check if the quantity is zero, then remove the item from the cart
+          if (decreaseCartItems[existingCartItemIndexToDecrease].quantity === 0) {
+            decreaseCartItems.splice(existingCartItemIndexToDecrease, 1);
+          }
+      
+          const totalCountAfterDecrease = decreaseCartItems.reduce(
+            (total, item) => total - item.quantity,
+            0
+          );
+          const totalPriceAfterDecrease = decreaseCartItems.reduce(
+            (total, item) => total + item.product.price * item.quantity,
+            0
+          );
+          localStorage.setItem("cartItems", JSON.stringify(decreaseCartItems));
+          return {
+            ...state,
+            cartItems: decreaseCartItems,
+            totalCount: totalCountAfterDecrease,
+            totalPrice: totalPriceAfterDecrease,
+          };
+        }
+        return state;
+      
 
     default:
       return state;

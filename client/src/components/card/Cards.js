@@ -4,12 +4,13 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { Button, Chip } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProductToCart } from "../../redux/actions/productActions";
 
 function Cards({ item }) {
   const dispatch = useDispatch();
- 
+  const cartItems = useSelector((state) => state.getproductsdata.cartItems);
+  console.log("cartItems : ", cartItems);
   const addToCart = (productId    ) =>{
      dispatch(addProductToCart(productId));
 

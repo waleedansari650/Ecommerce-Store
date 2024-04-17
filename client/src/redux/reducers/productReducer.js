@@ -7,9 +7,14 @@ import {
   PRODUCT_REMOVE_TO_CART,
   INCREASE_QUANTITY,
   DECREASE_QUANTITY,
+  LOGIN_SESSION,
+  LOGOUT_USER,
+  GET_USER_DATA,
 } from "../action-types/productActionType";
 
 const initialState = {
+  session : localStorage.getItem("token")? true : false,
+  user : {},
   products: [],
   cartItems: [],
   totalCount: localStorage.getItem("cartItems")
@@ -31,6 +36,23 @@ if (savedCartItems) {
 }
 export const productReducer = (state = initialState, action) => {
   switch (action.type) {
+    case LOGIN_SESSION :
+      return {
+        ...state,
+        session : action.payload
+      }
+      case GET_USER_DATA: 
+      return {
+        ...state,
+        user : action.payload
+      }
+      case LOGOUT_USER : {
+        localStorage.removeItem('token');
+        return{
+          ...state,
+          session : action.payload
+        }
+      }
     case ADD_NEW_PRODUCT:
       return {
         ...state,
@@ -185,7 +207,7 @@ export const productReducer = (state = initialState, action) => {
           }
       
           const totalCountAfterDecrease = decreaseCartItems.reduce(
-            (total, item) => total - item.quantity,
+            (total, item) => total + item.quantity,
             0
           );
           const totalPriceAfterDecrease = decreaseCartItems.reduce(

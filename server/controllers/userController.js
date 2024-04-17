@@ -135,6 +135,7 @@ module.exports.login = async (req, res) => {
     return res.status(200).json({
       message: "User Login Successful...!",
       username: userExist.name,
+      success : true,
       token,
     });
   } catch (error) {
@@ -156,7 +157,7 @@ module.exports.getUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found...!" });
     }
-    return res.status(200).json({ user });
+    return res.status(200).json({ user, success : true });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error...!" });
   }

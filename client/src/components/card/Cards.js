@@ -9,8 +9,6 @@ import { addProductToCart } from "../../redux/actions/productActions";
 
 function Cards({ item }) {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.getproductsdata.cartItems);
-  console.log("cartItems : ", cartItems);
   const addToCart = (productId    ) =>{
      dispatch(addProductToCart(productId));
 

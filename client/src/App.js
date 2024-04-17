@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./index.css";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/home/Home";
@@ -12,6 +12,9 @@ import ForgotPassword from "./components/forgotPassword/ForgotPassword";
 import OTP from "./components/otp/OTP";
 import ResetPassword from "./components/resetPassword/ResetPassword";
 import { AuthorizeUser } from "./middlewares/auth";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import Profile from "./components/profile/Profile";
 function App() {
   return (
     <>
@@ -25,6 +28,7 @@ function App() {
         <Route path="/resetPassword" element={<ResetPassword />} />
         <Route path="/products" element={<AuthorizeUser><Products /></AuthorizeUser>} />
         <Route path="/cart" element={<AuthorizeUser><Cart /></AuthorizeUser>} />
+        <Route path="/profile" element={<AuthorizeUser><Profile /></AuthorizeUser>} />
         <Route
           path="/activation/:activation_token"
           element={<ActivationPage />}

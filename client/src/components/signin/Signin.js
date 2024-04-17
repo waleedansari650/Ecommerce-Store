@@ -16,11 +16,12 @@ import * as Yup from "yup";
 import { useNavigate, Link as RouterLink } from "react-router-dom"; // Import Link as RouterLink
 import toast, { Toaster } from "react-hot-toast";
 import { loginUser } from "../../services/authenticateServies";
+import { useDispatch } from "react-redux";
 
 function Signin() {
   const [avatarImage, setAvatarImage] = React.useState(null);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email")
@@ -41,7 +42,7 @@ function Signin() {
     onSubmit: async (values) => {
       try {
         if (values) {
-          let loginUserPromise = loginUser(values);
+          let loginUserPromise = dispatch(loginUser(values));
           toast.promise(loginUserPromise, {
             loading: "Logging in...!",
             success: "🦄 Login Successfuly ",

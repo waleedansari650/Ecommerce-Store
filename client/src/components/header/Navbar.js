@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,150 +13,182 @@ import MenuItem from "@mui/material/MenuItem";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../../redux/actions/productActions";
+import toast from "react-hot-toast";
+import { getUser } from "../../services/authenticateServies";
 
 const pages = ["Home", "Products"];
-// const settings = ["Profile", "Account", "Dashboard", "Logout"];
-const settings = ["Sign in", "Sign up"];
 
 function Navbar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null); 
+  const userData = useSelector((state)=>state.getproductsdata.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const cartProductCount = useSelector((state) => state.getproductsdata.totalCount);
- 
+  const userLogin = useSelector((state) => state.getproductsdata.session);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [settings, setSettings] = useState([]);
+  
+  useEffect(() => {
+    if (userLogin) {
+      setSettings(["Profile", "Logout"]);
+    } else {
+      setSettings(["Sign up", "Sign in"]);
+    }
+  }, [userLogin]);
+  useEffect(()=>{
+    let getUserPromise =  dispatch(getUser());
+    getUserPromise.catch((error) => {
+   if (error.error === "Authentication Failed!") {
+     console.error("Authentication failed:", error.error);
+     toast.error("Authentication failed. Please login again.");
+   setTimeout(() => {
+     navigate("/signin");
+   })
+   } else {
+     // Handle other errors
+     console.error("Error fetching user:", error);
+   }
+ });
+ },[])
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseNavMenu = (page) => {
-    if(page === "Home"){
-        navigate('/');
-    }  else if(page === "Products"){
-        navigate('/products');
-    } else if(page === 'cart'){
-    navigate('/cart');
-
-  }
+    navigate(page === "Home" ? "/" : `/${page}`);
+    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = (setting) => {
-    if(setting === "Sign in"){
-        navigate('/signin');
-    }   else if(setting === "Sign up"){
-        navigate('/signup');
-    }  
-  };
-
-  const [counter, setCounter] = useState(0);
-
-  const handleIncrement = () => {
-    setCounter(counter + 1);
-  };
-
-  const handleDecrement = () => {
-    if (counter > 0) {
-      setCounter(counter - 1);
+    switch (setting) {
+      case "Sign in":
+        navigate("/signin");
+        break;
+      case "Sign up":
+        navigate("/signup");
+        break;
+      case "Profile":
+        navigate("/profile");
+        break;
+      case "Logout":
+        handleLogout();
+        break;
+      default:
+        break;
     }
+    setAnchorElUser(null);
   };
-  // console.log("Function callled");
- 
+
+  const handleLogout = () => {
+    dispatch(logoutUser(false))
+    setTimeout(()=>{
+      navigate('/signin');
+      toast.success("Logout Successfuly")
+    },1000)
+  };
+
   return (
     <>
-        <AppBar position="static">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            style={{ cursor: "pointer" }}
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq-AmpT1wT2ZrZ4Jx_Suv2Sp2NSTiWaX1kYw&usqp=CAU"
-              alt="Logo"
-              style={{
-                marginRight: 10,
-                borderRadius: "50%", // Rounded corners
-                width: "40px", // Set width
-                height: "40px", // Set height
-                objectFit: "cover", // Maintain aspect ratio and cover the space
+      <AppBar position="static">
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              style={{ cursor: "pointer" }}
+              sx={{
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                color: "inherit",
+                textDecoration: "none",
               }}
-            />
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={()=>{handleCloseNavMenu(page)}}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                {page}
-              </Button>
-            ))}
-          </Box>
-          {/* cart badge */}
-          <Badge
-            badgeContent={cartProductCount ? cartProductCount : "0"}
-            color="warning"
-            anchorOrigin={{ vertical: "top", horizontal: "left",  }}
-            style={{ marginRight: '1rem', transition: 'transform 0.2s' }}
-      sx={{
-        '&:hover': {
-          transform: 'scale(1.2)', 
-          cursor : 'pointer'
-        }
-      }}
-          >
-            <ShoppingCartIcon fontSize="large"  onClick= {()=>{handleCloseNavMenu('cart')}}/>
-          </Badge>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+              onClick={() => handleCloseNavMenu("Home")}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq-AmpT1wT2ZrZ4Jx_Suv2Sp2NSTiWaX1kYw&usqp=CAU"
+                alt="Logo"
+                style={{
+                  marginRight: 10,
+                  borderRadius: "50%", // Rounded corners
+                  width: "40px", // Set width
+                  height: "40px", // Set height
+                  objectFit: "cover", // Maintain aspect ratio and cover the space
+                }}
+              />
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              {pages.map((page) => (
+                <Button
+                  key={page}
+                  onClick={() => handleCloseNavMenu(page)}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  {page}
+                </Button>
               ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
-   
+            </Box>
+            <Badge
+              badgeContent={cartProductCount || "0"}
+              color="warning"
+              anchorOrigin={{ vertical: "top", horizontal: "left" }}
+              style={{ marginRight: "1rem", transition: "transform 0.2s" }}
+              sx={{
+                "&:hover": {
+                  transform: "scale(1.2)",
+                  cursor: "pointer",
+                },
+              }}
+              onClick={() => handleCloseNavMenu("cart")}
+            >
+              <ShoppingCartIcon fontSize="large" />
+            </Badge>
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="User Avatar" src={userData.user?.profile} />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={() => setAnchorElUser(null)}
+              >
+                {settings.map((setting) => (
+                  <MenuItem
+                    key={setting}
+                    onClick={() => handleCloseUserMenu(setting)}
+                  >
+                    {setting}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
     </>
-    
   );
 }
+
 export default Navbar;

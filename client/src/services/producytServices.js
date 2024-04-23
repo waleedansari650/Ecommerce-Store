@@ -1,5 +1,5 @@
 import axios from "axios";
-import { addingProduct, deleteTheProduct, getAllProducts, updateTheProduct } from "../redux/actions/productActions";
+import { addingProduct, cartItemsRemove, deleteTheProduct, getAllProducts, updateTheProduct } from "../redux/actions/productActions";
 const axiosInstance = axios.create({
   baseURL: "http://localhost:4000/api/products",
   headers: {
@@ -101,4 +101,55 @@ export const updateExistingProduct = (credentials) => {
     }
 
   }
+};
+// api hitting services code (productServices.js)
+
+export const getToken = async (setClientToken) => {
+  try {
+    const response = await axiosInstance.get("/braintree/token");
+    if (response.status === 200) {
+      setClientToken(response.data.clientToken);
+    } else {
+      console.error("Failed to get client token:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error fetching client token:", error.message);
+  }
+};
+export const payment =  (nonce, cartItems, totalProductPrice) => {
+  return async (dispatch)=>{
+  try {
+    const config = {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    };
+
+    const formattedCartItems = cartItems.map(item => ({
+      productId: item.product._id, 
+      quantity: item.quantity
+    }));
+    console.log("formattedCartItems : ", formattedCartItems);
+    const { data } = await axiosInstance.post(
+      '/braintree/payment',
+      {
+        nonce,
+        cartItems: formattedCartItems,
+        totalProductPrice
+      },
+      config
+    );
+    console.log("services data : ",data);
+      if(data.success){
+        localStorage.removeItem("cartItems");
+        dispatch(cartItemsRemove());
+        return Promise.resolve(data);
+      }
+
+  } catch (error) {
+    console.error("Payment error:", error);
+    return Promise.reject(error.response.data);
+  }
+}
 };

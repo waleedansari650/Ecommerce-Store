@@ -9,4 +9,5 @@ export const DECREASE_QUANTITY = 'DECREASE_QUANTITY';
 export const LOGIN_SESSION = 'LOGIN_SESSION';
 export const LOGOUT_USER = 'LOGOUT_USER';
 export const GET_USER_DATA = 'GET_USER_DATA';
+export const REMOVE_CART_ITEMS = 'REMOVE_CART_ITEMS';
 

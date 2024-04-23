@@ -1,4 +1,4 @@
-export {ADD_NEW_PRODUCT, GET_USER_DATA,  LOGIN_SESSION, DECREASE_QUANTITY,INCREASE_QUANTITY, PRODUCT_REMOVE_TO_CART, GET_ALL_PRODUCTS, DELETE_PRODUCT, UPDATE_PRODUCT,PRODUCT_LIST_TO_CART} from "../action-types/productActionType";
+export {ADD_NEW_PRODUCT, GET_USER_DATA, REMOVE_CART_ITEMS,  LOGIN_SESSION, DECREASE_QUANTITY,INCREASE_QUANTITY, PRODUCT_REMOVE_TO_CART, GET_ALL_PRODUCTS, DELETE_PRODUCT, UPDATE_PRODUCT,PRODUCT_LIST_TO_CART} from "../action-types/productActionType";
 
 export const addingProduct = (data) =>{
     return {
@@ -22,6 +22,12 @@ export const updateTheProduct = (data) =>{
     return {
         type: "UPDATE_PRODUCT",
         payload: data.data
+    }
+}
+export const cartItemsRemove = () =>{
+    return {
+        type :  "REMOVE_CART_ITEMS",
+        payload : []
     }
 }
 export const addProductToCart = (data) =>{

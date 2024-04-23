@@ -10,6 +10,7 @@ import {
   LOGIN_SESSION,
   LOGOUT_USER,
   GET_USER_DATA,
+  REMOVE_CART_ITEMS,
 } from "../action-types/productActionType";
 
 const initialState = {
@@ -118,7 +119,12 @@ export const productReducer = (state = initialState, action) => {
       return { ...state, cartItems: updatedCartItems, totalCount, totalPrice };
 
 
-
+      case REMOVE_CART_ITEMS: 
+      return {...state,
+       cartItems : [],
+       totalCount : 0,
+       totalPrice : 0,
+      };
     case PRODUCT_REMOVE_TO_CART:
       const productIdToRemove = action.payload;
       const existingCartItemIndexToRemove = state.cartItems.findIndex(

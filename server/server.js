@@ -13,7 +13,7 @@ app.use(express.static('./public'));
 app.use(cors());
 app.use('/', userRoutes);
 app.use('/api/products/', productRoutes);
-app.use('/api/cart/', cartRoutes);
+// app.use('/api/cart/', cartRoutes);
 connect();
 app.listen(PORT, ()=>{
     console.log(`Server is running on port http://localhost:${PORT}`);

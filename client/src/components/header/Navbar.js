@@ -87,9 +87,9 @@ function Navbar() {
 
   const handleLogout = () => {
     dispatch(logoutUser(false))
+    toast.success("Logout Successfuly...!")
     setTimeout(()=>{
       navigate('/signin');
-      toast.success("Logout Successfuly")
     },1000)
   };
 
@@ -155,7 +155,9 @@ function Navbar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="User Avatar" src={userData.user?.profile} />
+                  {
+                    userLogin? <Avatar alt="User Avatar" src={userData.user?.profile} /> :  <Avatar  />
+                  }
                 </IconButton>
               </Tooltip>
               <Menu

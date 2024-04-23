@@ -1,6 +1,4 @@
-// Cart.js
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, Grid, Fade } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Navbar from "../header/Navbar";
@@ -12,11 +10,22 @@ import {
   increaseQuantity,
 } from "../../redux/actions/productActions";
 import { useNavigate } from "react-router-dom";
+import DropIn from "braintree-web-drop-in-react";
+import { getToken, payment } from "../../services/producytServices";
+import toast, { Toaster } from "react-hot-toast";
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.getproductsdata.session);
   const cartItems = useSelector((state) => state.getproductsdata.cartItems);
+
   const navigate = useNavigate();
+  //payment
+  const [clientToken, setClientToken] = useState("");
+  const [instance, setInstance] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isPaymentDisabled, setIsPaymentDisabled] = useState(true);
+
   const totalProductPrice = useSelector(
     (state) => state.getproductsdata.totalPrice
   );
@@ -33,10 +42,52 @@ const Cart = () => {
       dispatch(decreaseQuantity(productId));
     }
   };
- 
+
+  useEffect(() => {
+    getToken(setClientToken);
+  }, [auth]);
+
+  useEffect(() => {
+    setIsPaymentDisabled(!instance || !auth); // Disable button if instance or auth is null
+  }, [instance, auth]);
+
+  const handlePayment = async () => {
+    try {
+      setLoading(true);
+      const { nonce } = await instance.requestPaymentMethod();
+      let paymentPromise = dispatch(payment(nonce, cartItems, totalProductPrice));
+      toast.promise(paymentPromise, {
+        loading: "Order dispatching...!",
+        success: (response) => <b>{response.message}</b>,
+        error: (error) => <b>{error.error}</b>,
+      });
+      paymentPromise.then(() => {
+        setLoading(false);
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      }).catch((error) => {
+        console.log(error);
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error(`🦄 ${error}`);
+      setLoading(false);
+    }
+  };
+
+  const handleInstanceCreation = (instance) => {
+    setInstance(instance);
+    // Add event listener to enable payment button when all fields are filled
+    instance.on("paymentOptionSelected", () => {
+      setIsPaymentDisabled(false);
+    });
+  };
+
   return (
     <>
       <Navbar />
+      <Toaster position="top-center" reverseOrder={false} />
       <Box p={4} style={{ margin: "auto", maxWidth: 900 }}>
         <Box p={4}>
           <Fade in timeout={1000}>
@@ -45,6 +96,7 @@ const Cart = () => {
             </Typography>
           </Fade>
           <Grid container spacing={2}>
+            {/* Map through cart items */}
             {cartItems.map((product, index) => (
               <Grid item xs={12} sm={6} key={index}>
                 <Box
@@ -79,7 +131,7 @@ const Cart = () => {
                     {product.product.name}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    Price: $ {product.product.price }
+                    Price: $ {product.product.price}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     Total Price: $ {product.product.price * product.quantity}
@@ -91,14 +143,18 @@ const Cart = () => {
                     <Button
                       style={{ padding: "0px" }}
                       variant="outlined"
-                      onClick={() => handleQuantityChange(product.product._id, "decrement")}
+                      onClick={() =>
+                        handleQuantityChange(product.product._id, "decrement")
+                      }
                     >
                       -
                     </Button>
                     <Button
                       style={{ padding: "0px ", margin: "0 1rem" }}
                       variant="outlined"
-                      onClick={() => handleQuantityChange(product.product._id, "increment")}
+                      onClick={() =>
+                        handleQuantityChange(product.product._id, "increment")
+                      }
                     >
                       +
                     </Button>
@@ -135,6 +191,39 @@ const Cart = () => {
           </Box>
         </Box>
       </Box>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {!clientToken || !cartItems.length > 0 ? (
+          ""
+        ) : (
+          <>
+            <DropIn
+              style={{ maxWidth: "50%" }}
+              options={{
+                authorization: clientToken,
+                paypal: {
+                  flow: "vault",
+                },
+              }}
+              onInstance={handleInstanceCreation}
+            />
+            <Button
+              onClick={handlePayment}
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isPaymentDisabled}
+            >
+              {loading ? "Processing..." : "Make Payment"}
+            </Button>
+          </>
+        )}
+      </div>
       <Footer />
     </>
   );

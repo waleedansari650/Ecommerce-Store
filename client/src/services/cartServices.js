@@ -8,7 +8,6 @@ const axiosInstance = axios.create({
   });
 
 export const productListToCart = (credentials) => {
-    console.log( "credentials : ", credentials)
     return async (dispatch) =>{
         try {
             const config = {
@@ -25,6 +24,9 @@ export const productListToCart = (credentials) => {
         }
     }
 }
+
+
+
 
 
 

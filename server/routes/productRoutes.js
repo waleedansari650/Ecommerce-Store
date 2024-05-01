@@ -1,7 +1,7 @@
 const app = require('express');
 const router = app.Router();
 const {upload} = require("../multer");
-const { authenticate, localVairables } = require('../middlewares/authenticate');
+const { authenticate } = require('../middlewares/authenticate');
 const { addProduct, deleteProduct, updateProduct, getProducts, getSpecificProduct, braintreeTokenController, brainTreePaymentController } = require('../controllers/productController');
 
 

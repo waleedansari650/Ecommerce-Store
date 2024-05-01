@@ -18,7 +18,7 @@ import { logoutUser } from "../../redux/actions/productActions";
 import toast from "react-hot-toast";
 import { getUser } from "../../services/authenticateServies";
 
-const pages = ["Home", "Products"];
+const pages = ["Home", "Products", "Orders"];
 
 function Navbar() {
   const userData = useSelector((state)=>state.getproductsdata.user);
@@ -34,7 +34,8 @@ function Navbar() {
     if (userLogin) {
       setSettings(["Profile", "Logout"]);
     } else {
-      setSettings(["Sign up", "Sign in"]);
+      setSettings(["Sign up", "Sign in"
+    ]);
     }
   }, [userLogin]);
   useEffect(()=>{

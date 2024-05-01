@@ -6,16 +6,30 @@ import Typography from "@mui/material/Typography";
 import { Button, Chip } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { addProductToCart } from "../../redux/actions/productActions";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Cards({ item }) {
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.getproductsdata.session);
+  const navigate = useNavigate();
   const addToCart = (productId    ) =>{
-     dispatch(addProductToCart(productId));
-
+    if(!auth){
+      toast.error("Required to Login...!");
+      setTimeout(()=>{
+        navigate('/signin');
+      },2000)
+    } 
+      else{
+        dispatch(addProductToCart(productId));
+      toast.success("Product Add successfuly...!");
+      }
   }
 
   
   return (
+    <>
+    <Toaster position="top-center" reverseOrder={false} />
     <div style={{ display: "flex", flexDirection: "row" }}>
       <Card sx={{ maxWidth: 270, margin: "2rem 0.5rem" }}>
         <CardMedia
@@ -69,6 +83,7 @@ function Cards({ item }) {
         </div>
       </Card>
     </div>
+    </>
   );
 }
 

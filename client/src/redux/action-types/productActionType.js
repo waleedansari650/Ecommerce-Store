@@ -10,4 +10,6 @@ export const LOGIN_SESSION = 'LOGIN_SESSION';
 export const LOGOUT_USER = 'LOGOUT_USER';
 export const GET_USER_DATA = 'GET_USER_DATA';
 export const REMOVE_CART_ITEMS = 'REMOVE_CART_ITEMS';
-
+export const GET_ADDRESS = "GET_ADDRESS";
+export const GET_ORDERS = "GET_ORDERS";
+export const GET_SPECIFIC_ORDER = "GET_SPECIFIC_ORDER";

@@ -2,7 +2,7 @@ import { AppBar, Toolbar, Typography, Grid } from "@mui/material";
 
 const Footer = () => {
   return (
-    <AppBar position="relative" color="primary" style={{ top: "50vh", bottom: 0,  }}>
+    <AppBar position="relative" color="primary" style={{ top: "58vh", bottom: 0,  }}>
       <Toolbar style={{postition : "absolute"}}>
         <Grid container justifyContent="center">
           <Grid item>

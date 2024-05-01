@@ -116,7 +116,7 @@ export const getToken = async (setClientToken) => {
     console.error("Error fetching client token:", error.message);
   }
 };
-export const payment =  (nonce, cartItems, totalProductPrice) => {
+export const payment =  (nonce, cartItems, totalProductPrice, address) => {
   return async (dispatch)=>{
   try {
     const config = {
@@ -130,23 +130,22 @@ export const payment =  (nonce, cartItems, totalProductPrice) => {
       productId: item.product._id, 
       quantity: item.quantity
     }));
-    console.log("formattedCartItems : ", formattedCartItems);
     const { data } = await axiosInstance.post(
       '/braintree/payment',
       {
         nonce,
         cartItems: formattedCartItems,
+        address,
         totalProductPrice
       },
       config
     );
-    console.log("services data : ",data);
       if(data.success){
-        localStorage.removeItem("cartItems");
         dispatch(cartItemsRemove());
-        return Promise.resolve(data);
       }
-
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("__paypal_storage__");
+      return Promise.resolve(data);
   } catch (error) {
     console.error("Payment error:", error);
     return Promise.reject(error.response.data);

@@ -11,11 +11,18 @@ import {
   LOGOUT_USER,
   GET_USER_DATA,
   REMOVE_CART_ITEMS,
+  GET_ADDRESS,
+  GET_ORDERS,
+  GET_SPECIFIC_ORDER,
+  
 } from "../action-types/productActionType";
 
 const initialState = {
   session : localStorage.getItem("token")? true : false,
   user : {},
+  specificOrder : {},
+  orders : [],
+  address : {},
   products: [],
   cartItems: [],
   totalCount: localStorage.getItem("cartItems")
@@ -193,6 +200,13 @@ export const productReducer = (state = initialState, action) => {
       } else {
         return state;
       }
+      case GET_ADDRESS : 
+      return {
+        ...state,
+        address : action.payload
+      }
+
+
       case DECREASE_QUANTITY:
         const productIdToDecrease = action.payload;
         const existingCartItemIndexToDecrease = state.cartItems.findIndex(
@@ -229,8 +243,17 @@ export const productReducer = (state = initialState, action) => {
           };
         }
         return state;
-      
-
+      case GET_ORDERS :
+        return {
+          ...state,
+          orders : action.payload
+        }
+        case GET_SPECIFIC_ORDER : {
+          return {
+            ...state,
+            specificOrder : action.payload
+          }
+        }
     default:
       return state;
   }

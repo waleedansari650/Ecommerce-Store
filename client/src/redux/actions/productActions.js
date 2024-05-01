@@ -1,4 +1,4 @@
-export {ADD_NEW_PRODUCT, GET_USER_DATA, REMOVE_CART_ITEMS,  LOGIN_SESSION, DECREASE_QUANTITY,INCREASE_QUANTITY, PRODUCT_REMOVE_TO_CART, GET_ALL_PRODUCTS, DELETE_PRODUCT, UPDATE_PRODUCT,PRODUCT_LIST_TO_CART} from "../action-types/productActionType";
+export {ADD_NEW_PRODUCT, GET_SPECIFIC_ORDER, GET_ORDERS, GET_ADDRESS, GET_USER_DATA, REMOVE_CART_ITEMS,  LOGIN_SESSION, DECREASE_QUANTITY,INCREASE_QUANTITY, PRODUCT_REMOVE_TO_CART, GET_ALL_PRODUCTS, DELETE_PRODUCT, UPDATE_PRODUCT,PRODUCT_LIST_TO_CART} from "../action-types/productActionType";
 
 export const addingProduct = (data) =>{
     return {
@@ -72,3 +72,22 @@ export const getUserData = (data) =>{
         payload : data
     }
 }
+export const getYourAddress = (data) =>{
+    return {
+        type : "GET_ADDRESS",
+        payload : data
+    }
+}
+export const getYourOrders = (data) =>{
+    return {
+        type : "GET_ORDERS",
+        payload : data
+    }
+}
+export const getSpecificOrderDetail = (data) =>{
+    return {
+        type : "GET_SPECIFIC_ORDER",
+        payload : data
+    }
+}
+

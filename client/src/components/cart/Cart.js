@@ -9,8 +9,7 @@ import {
   decreaseQuantity,
   increaseQuantity,
 } from "../../redux/actions/productActions";
-import { useNavigate } from "react-router-dom";
-import DropIn from "braintree-web-drop-in-react";
+import { Link, useNavigate } from "react-router-dom";
 import { getToken, payment } from "../../services/producytServices";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -18,22 +17,21 @@ const Cart = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.getproductsdata.session);
   const cartItems = useSelector((state) => state.getproductsdata.cartItems);
-
   const navigate = useNavigate();
   //payment
-  const [clientToken, setClientToken] = useState("");
-  const [instance, setInstance] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isPaymentDisabled, setIsPaymentDisabled] = useState(true);
 
   const totalProductPrice = useSelector(
     (state) => state.getproductsdata.totalPrice
   );
 
   const handleToRemoveProduct = (id) => {
-    dispatch(removeProductToCart(id));
+    let removeProduct = dispatch(removeProductToCart(id));
+    if (removeProduct.payload === id) {
+      toast.success("Product Remove Successfuly...!");
+    } else {
+      toast.error("Product Not Found");
+    }
   };
-
   const handleQuantityChange = (productId, mode) => {
     if (mode === "increment") {
       dispatch(increaseQuantity(productId));
@@ -41,47 +39,6 @@ const Cart = () => {
     if (mode === "decrement") {
       dispatch(decreaseQuantity(productId));
     }
-  };
-
-  useEffect(() => {
-    getToken(setClientToken);
-  }, [auth]);
-
-  useEffect(() => {
-    setIsPaymentDisabled(!instance || !auth); // Disable button if instance or auth is null
-  }, [instance, auth]);
-
-  const handlePayment = async () => {
-    try {
-      setLoading(true);
-      const { nonce } = await instance.requestPaymentMethod();
-      let paymentPromise = dispatch(payment(nonce, cartItems, totalProductPrice));
-      toast.promise(paymentPromise, {
-        loading: "Order dispatching...!",
-        success: (response) => <b>{response.message}</b>,
-        error: (error) => <b>{error.error}</b>,
-      });
-      paymentPromise.then(() => {
-        setLoading(false);
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      }).catch((error) => {
-        console.log(error);
-      });
-    } catch (error) {
-      console.log(error);
-      toast.error(`🦄 ${error}`);
-      setLoading(false);
-    }
-  };
-
-  const handleInstanceCreation = (instance) => {
-    setInstance(instance);
-    // Add event listener to enable payment button when all fields are filled
-    instance.on("paymentOptionSelected", () => {
-      setIsPaymentDisabled(false);
-    });
   };
 
   return (
@@ -97,7 +54,7 @@ const Cart = () => {
           </Fade>
           <Grid container spacing={2}>
             {/* Map through cart items */}
-            {cartItems.map((product, index) => (
+            {cartItems?.map((product, index) => (
               <Grid item xs={12} sm={6} key={index}>
                 <Box
                   p={2}
@@ -199,30 +156,16 @@ const Cart = () => {
           justifyContent: "center",
         }}
       >
-        {!clientToken || !cartItems.length > 0 ? (
-          ""
-        ) : (
-          <>
-            <DropIn
-              style={{ maxWidth: "50%" }}
-              options={{
-                authorization: clientToken,
-                paypal: {
-                  flow: "vault",
-                },
-              }}
-              onInstance={handleInstanceCreation}
-            />
-            <Button
-              onClick={handlePayment}
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={isPaymentDisabled}
-            >
-              {loading ? "Processing..." : "Make Payment"}
-            </Button>
-          </>
-        )}
+      {
+        cartItems.length > 0 &&  (
+          <Link to={'/add-address'} >
+        <Button style={{width : "20rem"}}  variant="contained" sx={{ mt: 3, mb: 2 }}>
+          Place Order
+        </Button>
+      </Link>
+        )
+      }
+      
       </div>
       <Footer />
     </>

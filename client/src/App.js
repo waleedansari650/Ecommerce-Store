@@ -12,9 +12,11 @@ import ForgotPassword from "./components/forgotPassword/ForgotPassword";
 import OTP from "./components/otp/OTP";
 import ResetPassword from "./components/resetPassword/ResetPassword";
 import { AuthorizeUser } from "./middlewares/auth";
-import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
 import Profile from "./components/profile/Profile";
+import Orders from "./components/orders/Orders";
+import OrderAddress from "./components/orderAddress/OrderAddress";
+import Payment from "./components/payment/Payment";
+import ViewDetails from "./components/viewDetails/ViewDetails";
 function App() {
   return (
     <>
@@ -27,8 +29,13 @@ function App() {
         <Route path="/OTP" element={<OTP />} />
         <Route path="/resetPassword" element={<ResetPassword />} />
         <Route path="/products" element={<AuthorizeUser><Products /></AuthorizeUser>} />
+        <Route path="/Orders" element={<AuthorizeUser><Orders /></AuthorizeUser>} />
         <Route path="/cart" element={<AuthorizeUser><Cart /></AuthorizeUser>} />
         <Route path="/profile" element={<AuthorizeUser><Profile /></AuthorizeUser>} />
+        <Route path="/add-address" element={<AuthorizeUser><OrderAddress /></AuthorizeUser>} />
+        <Route path="/payment" element={<AuthorizeUser><Payment /></AuthorizeUser>} />
+        <Route path="/view-details/:id" element={<AuthorizeUser><ViewDetails /></AuthorizeUser>} />
+        
         <Route
           path="/activation/:activation_token"
           element={<ActivationPage />}

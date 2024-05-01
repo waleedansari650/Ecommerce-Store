@@ -16,6 +16,7 @@ import { deleteProduct, getProducts } from "../../services/producytServices";
 import AnimateSkeleton from "../animateSkeleton/AnimateSkeleton";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Loader from "../loader/Loader";
 
 
 const ProductTable = () => {
@@ -25,6 +26,8 @@ const ProductTable = () => {
   const products = useSelector((state)=> state.getproductsdata.products);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
 
   const openAddProductModel = () =>{
     setModelMode("add")
@@ -50,11 +53,15 @@ const ProductTable = () => {
  
   }
   useEffect(() => {
+    setLoading(true);
     let getProductsPromise = dispatch(getProducts());
-  
+    getProductsPromise.then(()=>{
+      setLoading(false);
+    })
     getProductsPromise.catch((error) => {
       if (error.error === "Authentication Failed!") {
         console.error("Authentication failed:", error.error);
+        setLoading(false);
         toast.error("Authentication failed. Please login again.");
       setTimeout(() => {
         navigate("/signin");
@@ -62,11 +69,14 @@ const ProductTable = () => {
       } else {
         // Handle other errors
         console.error("Error fetching products:", error);
+        setLoading(false);
       }
     });
   }, []);
 
   return (
+    <>
+    <Loader isLoading={loading} />
     <div
       style={{
         margin: "4rem auto",
@@ -152,6 +162,7 @@ const ProductTable = () => {
       </div>
       <Modal isModalOpen={isModalOpen} closeModal={closeModal} modelMode={modelMode} setModalOpen= {setModalOpen} updateProduct={updateProduct} />
     </div>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const Products = require("../models/Products");
 const paymentGateway = require("../middlewares/paymentGateway");
-const Orders = require("../models/Orders");
+const Cart = require("../models/Cart");
 // export const addProduct = () =>{}
 module.exports.addProduct = async (req, res) => {
   try {
@@ -42,27 +42,27 @@ module.exports.deleteProduct = async (req, res) => {
   }
 };
 
-module.exports.addProduct = async (req, res) => {
-  try {
-    const { name, description, price, category, stock } = req.body;
-    let url = `http://localhost:4000/uploads/${req.file.filename}`;
-    const product = await Products.create({
-      name,
-      description,
-      price,
-      category,
-      image: url,
-      stock,
-    });
-    return res.status(200).json({
-      success: true,
-      message: "Product added successfully...!",
-      data: product,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+// module.exports.addProduct = async (req, res) => {
+//   try {
+//     const { name, description, price, category, stock } = req.body;
+//     let url = `http://localhost:4000/uploads/${req.file.filename}`;
+//     const product = await Products.create({
+//       name,
+//       description,
+//       price,
+//       category,
+//       image: url,
+//       stock,
+//     });
+//     return res.status(200).json({
+//       success: true,
+//       message: "Product added successfully...!",
+//       data: product,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// };
 module.exports.updateProduct = async (req, res) => {
   console.log("params : ", req.params.id);
   const { name, description, price, category, stock } = req.body;
@@ -142,9 +142,8 @@ module.exports.braintreeTokenController = async (req, res) => {
 module.exports.brainTreePaymentController = async (req, res) => {
   try {
     const gateway = await paymentGateway();
-    const { cartItems, nonce, totalProductPrice } = req.body; // Destructure cartItems from req.body
-    console.log("req.body : ",req.body);
-    console.log("cartItems : ", req.body.cartItems.productId);
+    const { cartItems, nonce, totalProductPrice, address } = req.body; // Destructure cartItems from req.body
+  
 
     // Ensure that cartItems is an array
     if (!Array.isArray(cartItems)) {
@@ -166,9 +165,10 @@ module.exports.brainTreePaymentController = async (req, res) => {
               productId : item.productId,
               quantity : item.quantity,
             }));
-            const order = new Orders({
+            const order = new Cart({
               products: orderProducts, 
               totalQuantity : cartItems.reduce((total, items,)=> total + items.quantity, 0),
+              address : address,
               totalPrice : totalProductPrice,
               payment: result,
               buyer: req.userId,

@@ -44,10 +44,8 @@ export const getProducts = () => {
       const { data } = await axiosInstance.get("/getProducts", config);
       if (data.success) {
         dispatch(getAllProducts(data));
-        return Promise.resolve(data);
-      } else {
-        return Promise.reject(data.error);
-      }
+      } 
+      return Promise.resolve(data);
     } catch (error) {
       console.error("Error fetching products:", error);
       return Promise.reject(error.response.data);

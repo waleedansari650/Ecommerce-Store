@@ -54,7 +54,7 @@ const ProductTable = () => {
   }
   useEffect(() => {
     setLoading(true);
-    let getProductsPromise = dispatch(getProducts());
+    const getProductsPromise = dispatch(getProducts());
     getProductsPromise.then(()=>{
       setLoading(false);
     })

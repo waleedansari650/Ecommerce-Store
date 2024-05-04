@@ -14,9 +14,11 @@ import ResetPassword from "./components/resetPassword/ResetPassword";
 import { AuthorizeUser } from "./middlewares/auth";
 import Profile from "./components/profile/Profile";
 import Orders from "./components/orders/Orders";
+
 import OrderAddress from "./components/orderAddress/OrderAddress";
 import Payment from "./components/payment/Payment";
 import ViewDetails from "./components/viewDetails/ViewDetails";
+import OrderDelivery from "./components/delivery/OrderDelivery";
 function App() {
   return (
     <>
@@ -35,6 +37,7 @@ function App() {
         <Route path="/add-address" element={<AuthorizeUser><OrderAddress /></AuthorizeUser>} />
         <Route path="/payment" element={<AuthorizeUser><Payment /></AuthorizeUser>} />
         <Route path="/view-details/:id" element={<AuthorizeUser><ViewDetails /></AuthorizeUser>} />
+        <Route path="/Delivery" element={<AuthorizeUser><OrderDelivery /></AuthorizeUser>} />
         
         <Route
           path="/activation/:activation_token"

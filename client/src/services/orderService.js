@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getSpecificOrderDetail, getYourAddress, getYourOrders } from "../redux/actions/productActions";
+import { deleteOrder, deliverOrder, getSpecificOrderDetail, getYourAddress, getYourOrders } from "../redux/actions/productActions";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:4000/api/order/",
@@ -82,6 +82,48 @@ export const getSpecificOrder = ({id})=>{
         dispatch(getSpecificOrderDetail(data.data));
       }
       return Promise.resolve(data);
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+  }
+}
+export const deleteSpecificProduct = (id) =>{
+  return async(dispatch)=>{
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      const { data } = await axiosInstance.delete(`/deleteSpecificProduct/${id}`, config);
+      if(data.success){
+        dispatch(deleteOrder(id));
+      }
+      return Promise.resolve(data);
+    } catch (error) {
+      return Promise.reject(error.response.data);
+    }
+
+  }
+}
+
+export const deliverProduct = (credentials) =>{
+  console.log("Services credentials : ", credentials);
+  return async(dispatch)=>{
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      const { data } = await axiosInstance.put(`/deliverProduct`, credentials,config);
+      console.log("Services data : ", data.data);
+      if(data.success){
+        dispatch(deliverOrder(data.data));
+      }
+      return Promise.resolve(data);  
     } catch (error) {
       return Promise.reject(error.response.data);
     }

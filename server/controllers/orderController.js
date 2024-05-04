@@ -41,7 +41,6 @@ module.exports.getAddressController = async (req, res)=>{
 module.exports.getOrderController = async(req, res)=>{
     try {
         const orders = await Cart.find({buyer : req.userId}).populate('buyer');
-        console.log(orders);
         return res.status(200).json({
             success : true,
             data : orders
@@ -63,5 +62,39 @@ module.exports.getSpecificOrder = async(req, res)=>{
     }
    
 }
+module.exports.deleteSpecificProduct = async(req, res) =>{
+    const {id} = req.params;
+    try {
+        const deleteOrder = await Cart.findOneAndDelete({_id: id});
+        if(!deleteOrder){
+            return res.status(404).json({error: "Order not found"});
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Order deleted successfully...!"
+        });
+    } catch (error) {
+        return res.json(400).json({error : error.message});
+    }
+}
 
-
+module.exports.deliverSpecificProduct = async(req, res) =>{
+    try {
+        const {id, value} = req.body;
+        const order = await Cart.findOneAndUpdate(
+            {_id : id},
+             {$set : {status : value}},
+             { new : true});
+        if(!order){
+            return res.status(404).json({error: "Order not found"});
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Order delivered successfully...!",
+            data : order,
+        });
+    } catch (error) {
+        console.log("error");
+    }
+}
+         

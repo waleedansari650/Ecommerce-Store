@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -8,21 +8,25 @@ import {
   TableRow,
   Paper,
   Button,
-  CircularProgress,
 } from "@mui/material";
 import Navbar from "../header/Navbar";
 import Footer from "../footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
-import { getOrders } from "../../services/orderService";
+import {
+  deleteSpecificProduct,
+  deliverProduct,
+  getOrders,
+} from "../../services/orderService";
 import { useNavigate } from "react-router-dom";
 import Loader from "../loader/Loader";
+import toast, { Toaster } from "react-hot-toast";
 
 const Orders = () => {
   const dispatch = useDispatch();
-  const orders = useSelector(state => state.getproductsdata.orders);
+  const orders = useSelector((state) => state.getproductsdata.orders);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true);
     const getOrder = dispatch(getOrders());
     getOrder
@@ -33,94 +37,151 @@ const Orders = () => {
         console.log("error : ", error);
         setLoading(false);
       });
-  },[])
-  const handleViewDetail = (id) =>{
+  }, []);
+  const handleViewDetail = (id) => {
     navigate(`/view-details/${id}`);
-  }
+  };
+  const handleDeleteProduct = (id) => {
+    setLoading(true);
+    const deleteOrder = dispatch(deleteSpecificProduct(id));
+    deleteOrder.then(() => {
+      setLoading(false);
+      toast.success("Order Deleted Successfully...!");
+    });
+  };
+  const handleDeliverProduct = (id) => {
+    const updateObject = {
+      ...{ id: id, value: "Delivered" },
+    };
+    const deliverOrder = dispatch(deliverProduct(updateObject));
+    toast.promise(deliverOrder, {
+      loading: "Delivering Order...",
+      success: (response) => <b>{response.message}</b>,
+      error: (error) => <b>{error.error}</b>,
+    });
+    deliverOrder
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  };
+
   return (
     <>
-    <Navbar />
-    
-    <Loader isLoading={loading} />
-      
-        <div
-      style={{
-        margin: "4rem auto",
-        position: "relative",
-        width: "fit-content",
-        textAlign: "center",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-      }}
-    >
+      <Navbar />
+      <Loader isLoading={loading} />
+      <Toaster position="top-center" reverseOrder={false} />
       <div
         style={{
+          margin: "4rem auto",
+          position: "relative",
+          width: "fit-content",
+          textAlign: "center",
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "center",
           alignItems: "center",
-          width: "100%",
+          flexDirection: "column",
         }}
       >
-        <h2 style={{ marginBottom: "1rem" }}>All Orders</h2>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <h2 style={{ marginBottom: "1rem" }}>All Orders</h2>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>No</TableCell>
+                  <TableCell>Order ID</TableCell>
+                  <TableCell>Buyer Name</TableCell>
+                  <TableCell>Total Products</TableCell>
+                  <TableCell>Total Quantity</TableCell>
+                  <TableCell>Total Price</TableCell>
+                  <TableCell>Payment Status</TableCell>
+                  <TableCell>Order Status</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {orders.length > 0 ? (
+                  orders.filter((order) => order.status !== "Delivered")
+                    .length > 0 ? (
+                    orders.map(
+                      (order, index) =>
+                        order.status !== "Delivered" && (
+                          <TableRow key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{order._id}</TableCell>
+                            <TableCell>{order.buyer.name}</TableCell>
+                            <TableCell>{order.products.length}</TableCell>
+                            <TableCell>{order.totalQuantity}</TableCell>
+                            <TableCell>$ {order.totalPrice}</TableCell>
+                            <TableCell>
+                              {order.payment.success.toString()}
+                            </TableCell>
+                            <TableCell>{order.status}</TableCell>
+                            <TableCell colSpan={3}>
+                              <Button
+                                onClick={() => {
+                                  handleViewDetail(order._id);
+                                }}
+                                variant="contained"
+                                style={{ marginLeft: "0.5rem" }}
+                                color="warning"
+                              >
+                                View Details
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  handleDeliverProduct(order._id);
+                                }}
+                                variant="contained"
+                                style={{ marginLeft: "0.5rem" }}
+                                color="primary"
+                              >
+                                Delivered
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  handleDeleteProduct(order._id);
+                                }}
+                                variant="contained"
+                                style={{ marginLeft: "0.5rem" }}
+                                color="error"
+                              >
+                                Delete
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        )
+                    )
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8}>No Pending Orders Found</TableCell>
+                    </TableRow>
+                  )
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8}>No Orders Found</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
       </div>
-      <div style={{ overflowX: "auto" }}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>No</TableCell>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Buyer Name</TableCell>
-                <TableCell>Total Products</TableCell>
-                <TableCell>Total Quantity</TableCell>
-                <TableCell>Total Price</TableCell>
-                <TableCell>Payment Status</TableCell>
-                <TableCell>Order Status</TableCell>
-                <TableCell></TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-  { orders.length > 0 ? (
-    orders.map((order, index) => (
-      <TableRow key={index}>
 
-        <TableCell>{index + 1}</TableCell>
-        <TableCell>{order._id}</TableCell>
-        <TableCell>{order.buyer.name}</TableCell>
-        <TableCell>{order.products.length}</TableCell>
-        <TableCell>{order.totalQuantity}</TableCell>
-        <TableCell>$ {order.totalPrice}</TableCell>
-        <TableCell>{order.payment.success.toString()}</TableCell>
-        <TableCell>{order.status}</TableCell>
-        <TableCell colSpan={3}>
-        <Button onClick={()=>{handleViewDetail(order._id)}} variant="contained" style={{ marginLeft: '0.5rem' }} color="warning">
-            View Details
-          </Button>
-          <Button variant="contained" style={{ marginLeft: '0.5rem' }} color="primary">
-            Delivered
-          </Button>
-          <Button variant="contained" style={{ marginLeft: '0.5rem' }} color="error">
-            Delete
-          </Button>
-        </TableCell>
-      </TableRow>
-    ))
-  ) : (
-    <TableRow>
-      <TableCell colSpan={8}>No Orders Found</TableCell>
-    </TableRow>
-  )}
-</TableBody>
-
-          </Table>
-        </TableContainer>
-      </div>
-    </div>
-    
-    <Footer />
+      <Footer />
     </>
   );
 };

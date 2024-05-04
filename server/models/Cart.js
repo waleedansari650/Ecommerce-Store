@@ -29,7 +29,7 @@ const cartSchema = new mongoose.Schema(
     status: {
       type: String,
       default: "Not Process",
-      enum: ["Not Process", "Processing", "Shipped", "Delivered", "cancel"],
+      
     },
   },
   { timestamps: true }

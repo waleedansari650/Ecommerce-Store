@@ -14,6 +14,8 @@ import {
   GET_ADDRESS,
   GET_ORDERS,
   GET_SPECIFIC_ORDER,
+  DELETE_ORDER,
+  DELIVER_ORDER
   
 } from "../action-types/productActionType";
 
@@ -254,6 +256,20 @@ export const productReducer = (state = initialState, action) => {
             specificOrder : action.payload
           }
         }
+        case DELIVER_ORDER :
+            console.log("reducer : ", action.payload._id);
+            return {
+              ...state,
+              orders : state.orders.map((order)=> order._id === action.payload._id? {...order, status : "Delivered" } : order),
+            }
+
+        case DELETE_ORDER :
+          return {
+            ...state,
+            orders : state.orders.filter((order)=> order._id !== action.payload)
+          }
+          
+          
     default:
       return state;
   }
